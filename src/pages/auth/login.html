@@ -1,0 +1,52 @@
+<main
+  class="d-flex flex-column justify-content-center align-items-center login"
+>
+  <div class="mb-2">
+    <img src="/assets/images/logo.svg" alt="Логотип" />
+  </div>
+  <form class="d-flex flex-column gap-2 novalidate">
+    <h1 class="pt-5 mb-3 text-center">Вход</h1>
+    <div class="input-group">
+      <label class="input-group-text" for="email">
+        <span class="far fa-envelope-open input-icon text-secondary"></span>
+      </label>
+      <input
+        class="form-control"
+        type="email"
+        id="email"
+        placeholder="Электронная почта"
+      />
+      <div id="email-error" class="invalid-feedback">
+        Введите корректную электронную почту
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-group-text" for="password">
+        <span class="input-icon"
+          ><img src="/assets/images/icons/lock.svg" alt=""
+        /></span>
+      </label>
+      <input
+        class="form-control"
+        type="password"
+        id="password"
+        placeholder="Пароль"
+      />
+      <div id="password-error" class="invalid-feedback">Заполните пароль</div>
+    </div>
+    <div class="form-check remember-me mt-1">
+      <label class="form-check-label" for="remember-me">Запомнить меня</label>
+      <input class="form-check-input" type="checkbox" id="remember-me" />
+    </div>
+    <button type="button" class="btn btn-primary mt-3" id="process-button">
+      Войти
+    </button>
+    <p class="auth-links">
+      Еще нет аккаунта?<a
+        href="/signup"
+        class="d-inline-block link-underline-primary ps-2"
+        >Пройдите регистрацию</a
+      >
+    </p>
+  </form>
+</main>

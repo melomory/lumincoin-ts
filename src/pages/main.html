@@ -1,0 +1,110 @@
+<section class="main">
+  <h1 class="my-5 pt-5 pb-3">Главная</h1>
+  <div>
+    <div class="d-flex gap-4 mb-5 flex-wrap">
+      <div>
+        <input
+          type="radio"
+          class="btn-check"
+          name="dates"
+          id="option-today"
+          autocomplete="off"
+          checked
+        />
+        <label class="btn btn-outline-secondary" for="option-today"
+          >Сегодня</label
+        >
+      </div>
+      <div>
+        <input
+          type="radio"
+          class="btn-check"
+          name="dates"
+          id="option-week"
+          autocomplete="off"
+        />
+        <label class="btn btn-outline-secondary" for="option-week"
+          >Неделя</label
+        >
+      </div>
+      <div>
+        <input
+          type="radio"
+          class="btn-check"
+          name="dates"
+          id="option-month"
+          autocomplete="off"
+        />
+        <label class="btn btn-outline-secondary" for="option-month"
+          >Месяц</label
+        >
+      </div>
+      <div>
+        <input
+          type="radio"
+          class="btn-check"
+          name="dates"
+          id="option-year"
+          autocomplete="off"
+        />
+        <label class="btn btn-outline-secondary" for="option-year">Год</label>
+      </div>
+      <div>
+        <input
+          type="radio"
+          class="btn-check"
+          name="dates"
+          id="option-all"
+          autocomplete="off"
+        />
+        <label class="btn btn-outline-secondary" for="option-all">Все</label>
+      </div>
+      <div>
+        <input
+          type="radio"
+          class="btn-check"
+          name="dates"
+          id="option-interval"
+          autocomplete="off"
+        />
+        <label class="btn btn-outline-secondary" for="option-interval"
+          >Интервал</label
+        >
+      </div>
+      <div class="d-flex gap-4 flex-wrap">
+        <div class="date-control">
+          <label class="" for="option-interval-from">c</label>
+          <input
+            id="option-interval-from"
+            autocomplete="off"
+            type="text"
+            placeholder="Дата"
+          />
+        </div>
+        <div class="date-control">
+          <label class="" for="option-interval-to">по</label>
+          <input
+            type="text"
+            id="option-interval-to"
+            autocomplete="off"
+            placeholder="Дата"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="row border-between">
+      <div class="col-12 col-lg-6 mt-5">
+        <h2 class="text-center mt-5 fs-3">Доходы</h2>
+        <div class="chart-container">
+          <canvas id="income-chart"></canvas>
+        </div>
+      </div>
+      <div class="col-12 col-lg-6 mt-5">
+        <h2 class="text-center mt-5 fs-3">Расходы</h2>
+        <div class="chart-container">
+          <canvas id="expenses-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

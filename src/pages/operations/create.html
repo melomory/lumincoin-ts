@@ -1,0 +1,38 @@
+<section class="operations-create">
+  <h1 class="my-5 pt-5">Создание дохода/расхода</h1>
+  <form class="pe-3">
+    <div class="mb-3">
+      <select id="type" class="form-select form-control" aria-label="Type">
+        <option selected disabled>Тип...</option>
+        <option value="income">Доход</option>
+        <option value="expense">Расход</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <select id="category" class="form-select form-control" aria-label="Category">
+        <option selected disabled>Категория...</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <input
+        type="text"
+        class="form-control"
+        id="amount"
+        placeholder="Сумма в $..."
+      />
+    </div>
+    <div class="mb-3">
+      <input type="text" class="form-control" id="date" placeholder="Дата..." />
+    </div>
+    <div class="mb-3">
+      <input
+        type="text"
+        class="form-control"
+        id="comment"
+        placeholder="Комментарий..."
+      />
+    </div>
+    <button class="btn btn-success" id="create-button">Создать</button>
+    <button class="btn btn-danger" id="cancel-button">Отмена</button>
+  </form>
+</section>

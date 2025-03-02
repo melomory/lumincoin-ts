@@ -1,0 +1,41 @@
+{
+  "name": "lumincoin-ts",
+  "version": "0.1.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "build-dev": "webpack --mode=development",
+    "build-prod": "webpack --mode=production",
+    "dev": "webpack server --open-app-name firefox --mode=development"
+  },
+  "keywords": [],
+  "author": "Denis Nikolaev",
+  "license": "MIT",
+  "devDependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-brands-svg-icons": "^6.6.0",
+    "@fortawesome/free-regular-svg-icons": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "autoprefixer": "^10.4.20",
+    "copy-webpack-plugin": "^12.0.2",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.3",
+    "mini-css-extract-plugin": "^2.9.2",
+    "postcss-loader": "^8.1.1",
+    "sass": "^1.81.0",
+    "sass-loader": "^16.0.3",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.7.3",
+    "webpack": "^5.96.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.6.0",
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.7",
+    "dotenv-webpack": "^8.1.0"
+  }
+}

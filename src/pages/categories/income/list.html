@@ -1,0 +1,29 @@
+<section class="category-list income-list">
+  <h1 class="my-5 pt-5">Доходы</h1>
+  <div class="d-flex flex-wrap gap-4 pe-3" id="categories">
+  </div>
+  <div
+    class="modal fade"
+    id="delete-action"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content py-3">
+        <div class="modal-body text-center fs-5">
+          Вы действительно хотите удалить категорию? Связанные доходы будут
+          удалены навсегда.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="confirm-button">
+            Да, удалить
+          </button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="cancel-button">
+            Не удалять
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

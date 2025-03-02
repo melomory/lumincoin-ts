@@ -1,0 +1,76 @@
+<main
+  class="d-flex flex-column justify-content-center align-items-center signup"
+>
+  <div class="mb-2">
+    <img src="/assets/images/logo.svg" alt="Логотип" />
+  </div>
+  <form class="d-flex flex-column gap-2 novalidate">
+    <h1 class="pt-5 mb-3 text-center">Создайте аккаунт</h1>
+    <div class="input-group">
+      <label class="input-group-text" for="full-name">
+        <span class="far fa-user input-icon text-secondary"></span>
+      </label>
+      <input
+        class="form-control"
+        type="text"
+        id="full-name"
+        placeholder="ФИО"
+      />
+      <div id="name-error" class="invalid-feedback">Заполните ФИО</div>
+    </div>
+    <div class="input-group">
+      <label class="input-group-text" for="email">
+        <span class="far fa-envelope-open input-icon text-secondary"></span>
+      </label>
+      <input
+        class="form-control"
+        type="email"
+        id="email"
+        placeholder="Электронная почта"
+      />
+      <div id="email-error" class="invalid-feedback">
+        Введите корректную электронную почту
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-group-text" for="password">
+        <span class="input-icon"
+          ><img src="/assets/images/icons/lock.svg" alt=""
+        /></span>
+      </label>
+      <input
+        class="form-control"
+        type="password"
+        id="password"
+        placeholder="Пароль"
+      />
+      <div id="password-error" class="invalid-feedback">Заполните пароль</div>
+    </div>
+    <div class="input-group">
+      <label class="input-group-text" for="password-repeat">
+        <span class="input-icon"
+          ><img src="/assets/images/icons/lock.svg" alt=""
+        /></span>
+      </label>
+      <input
+        class="form-control"
+        type="password"
+        id="password-repeat"
+        placeholder="Подтверждение пароля"
+      />
+      <div id="password-repeat-error" class="invalid-feedback">
+        Пароль и подтверждение пароля должны совпадать
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary mt-3" id="process-button">
+      Войти
+    </button>
+    <p class="auth-links">
+      Уже есть аккаунт?<a
+        href="/login"
+        class="d-inline-block link-underline-primary ps-2"
+        >Войдите в систему</a
+      >
+    </p>
+  </form>
+</main>
