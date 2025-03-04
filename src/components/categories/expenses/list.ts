@@ -7,10 +7,10 @@ import {
 } from "../../../types/request-result.type";
 
 export class ExpensesCategoryList {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
   private balanceElement: HTMLElement | null = null;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
     this.balanceElement = document.getElementById("balance");
@@ -27,7 +27,7 @@ export class ExpensesCategoryList {
       await ExpensesCategoryService.getCategories();
 
     if (response.error) {
-      alert(response.error);
+      alert(response.message);
       if (response.redirect) {
         this.openNewRoute(response.redirect);
         return;
@@ -42,13 +42,13 @@ export class ExpensesCategoryList {
    * @param {CategoryType[]} categories Категории.
    */
   private show(categories: CategoryType[] | null) {
-    const categoriesElement = document.getElementById("categories");
+    const categoriesElement: HTMLElement | null = document.getElementById("categories");
 
     if (!categoriesElement || !categories) {
       return;
     }
 
-    for (let i = 0; i < categories.length; i++) {
+    for (let i: number = 0; i < categories.length; i++) {
       const cardElement: HTMLElement = document.createElement("div");
       cardElement.classList.add("card", "p-1");
 
@@ -83,7 +83,7 @@ export class ExpensesCategoryList {
       categoriesElement.appendChild(cardElement);
     }
 
-    const cardEmptyElement = document.createElement("div");
+    const cardEmptyElement: HTMLElement = document.createElement("div");
     cardEmptyElement.classList.add(
       "card",
       "p-1",
@@ -112,6 +112,9 @@ export class ExpensesCategoryList {
 
     if (result.error || (result.balance && isNaN(result.balance))) {
       alert("Возникла ошибка при запросе баланса.");
+      if (result.redirect) {
+        this.openNewRoute(result.redirect);
+      }
       return null;
     }
 

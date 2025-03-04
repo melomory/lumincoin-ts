@@ -61,7 +61,7 @@ export class OperationsService {
       category: null,
     };
 
-    const result = await HttpUtils.request(
+    const result: RequestResultType = await HttpUtils.request(
       `/operations`,
       HttpMethod.POST,
       true,
@@ -92,13 +92,13 @@ export class OperationsService {
    * @param {number} id Ид операции
    * @returns {Promise<DefaultRequestResultType>} Результат удаления.
    */
-  static async deleteOperation(id: number): Promise<DefaultRequestResultType> {
+  public static async deleteOperation(id: number): Promise<DefaultRequestResultType> {
     const returnObject: DefaultRequestResultType = {
       error: false,
       redirect: null,
     };
 
-    const result = await HttpUtils.request(
+    const result: RequestResultType = await HttpUtils.request(
       `/operations/${id}`,
       HttpMethod.DELETE,
       true

@@ -3,11 +3,11 @@ import { DefaultRequestResultType } from "../../../types/request-result.type";
 import { UrlUtils } from "../../../utilities/url-utils";
 
 export class ExpensesCategoryDelete {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
-    const id = parseInt(UrlUtils.getUrlParam("id") ?? "");
+    const id: number = parseInt(UrlUtils.getUrlParam("id") ?? "");
     if (!id) {
       this.openNewRoute("/expenses");
       return;
@@ -31,7 +31,7 @@ export class ExpensesCategoryDelete {
       await ExpensesCategoryService.deleteCategory(id);
 
     if (response.error) {
-      alert(response.error);
+      alert(response.message);
       if (response.redirect) {
         this.openNewRoute(response.redirect);
         return;

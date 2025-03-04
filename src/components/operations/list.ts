@@ -2,22 +2,28 @@ import { BalanceService } from "../../services/balance-service";
 import { OperationsService } from "../../services/operations-service";
 import { FilterType } from "../../types/filter-type";
 import { OperationType } from "../../types/operation.type";
-import { BalanceRequestResultType } from "../../types/request-result.type";
+import {
+  BalanceRequestResultType,
+  OperationsRequestResultType,
+} from "../../types/request-result.type";
+import { JsonUtils } from "../../utilities/json-utils";
 
 export class OperationsList {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
   private balanceElement: HTMLElement | null = null;
-  private currentFilter: FilterType | null = null;
+  private currentFilter: FilterType | undefined;
   private optionIntervalFromElement: HTMLInputElement | null = null;
   private optionIntervalToElement: HTMLInputElement | null = null;
   private periodFilterElements: HTMLInputElement[] | null = [];
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
     this.findElements();
 
-    this.currentFilter = JSON.parse(localStorage.getItem("operations") ?? "");
+    this.currentFilter = JsonUtils.safeJsonParse(
+      localStorage.getItem("operations") as string
+    );
 
     if (!this.currentFilter) {
       this.currentFilter = {
@@ -36,7 +42,7 @@ export class OperationsList {
 
       if (this.optionIntervalFromElement) {
         if (this.currentFilter.dateFrom) {
-          let date = this.currentFilter.dateFrom.split("-");
+          const date: string[] = this.currentFilter.dateFrom.split("-");
           this.optionIntervalFromElement.value = `${date[2]}.${date[1]}.${date[0]}`;
         } else {
           this.optionIntervalFromElement.value =
@@ -46,7 +52,7 @@ export class OperationsList {
 
       if (this.optionIntervalToElement) {
         if (this.currentFilter.dateTo) {
-          let date = this.currentFilter.dateTo.split("-");
+          const date: string[] = this.currentFilter.dateTo.split("-");
           this.optionIntervalToElement.value = `${date[2]}.${date[1]}.${date[0]}`;
         } else {
           this.optionIntervalToElement.value =
@@ -60,7 +66,7 @@ export class OperationsList {
         (item: HTMLInputElement) => {
           item.addEventListener("focus", function () {
             if (this.value) {
-              let date = this.value.split(".");
+              const date: string[] = this.value.split(".");
               this.value = `${date[2]}-${date[1]}-${date[0]}`;
             }
 
@@ -69,7 +75,7 @@ export class OperationsList {
           item.addEventListener("blur", function () {
             this.type = "text";
             if (this.value) {
-              let date = this.value.split("-");
+              const date: string[] = this.value.split("-");
               this.value = `${date[2]}.${date[1]}.${date[0]}`;
             }
           });
@@ -126,10 +132,11 @@ export class OperationsList {
       throw new Error("Ошибка. Не установлен фильтр");
     }
 
-    const response = await OperationsService.getOperations(this.currentFilter);
+    const response: OperationsRequestResultType =
+      await OperationsService.getOperations(this.currentFilter);
 
     if (response.error) {
-      alert(response.error);
+      alert(response.message);
       if (response.redirect) {
         this.openNewRoute(response.redirect);
         return;
@@ -147,7 +154,7 @@ export class OperationsList {
       return;
     }
 
-    const current = [...this.periodFilterElements].filter(
+    const current: HTMLInputElement = [...this.periodFilterElements].filter(
       (item) => item.checked
     )[0];
 
@@ -163,7 +170,7 @@ export class OperationsList {
         this.optionIntervalFromElement.value &&
         this.optionIntervalFromElement.value !== this.currentFilter.dateFrom
       ) {
-        let date = this.optionIntervalFromElement.value.split(".");
+        const date: string[] = this.optionIntervalFromElement.value.split(".");
         this.currentFilter.dateFrom = `${date[2]}-${date[1]}-${date[0]}`;
       } else {
         this.currentFilter.dateFrom = null;
@@ -174,7 +181,7 @@ export class OperationsList {
         this.optionIntervalToElement.value &&
         this.optionIntervalToElement.value !== this.currentFilter.dateFrom
       ) {
-        let date = this.optionIntervalToElement.value.split(".");
+        const date: string[] = this.optionIntervalToElement.value.split(".");
         this.currentFilter.dateTo = `${date[2]}-${date[1]}-${date[0]}`;
       } else {
         this.currentFilter.dateTo = null;
@@ -203,10 +210,10 @@ export class OperationsList {
       return;
     }
 
-    for (let i = 0; i < operations.length; i++) {
+    for (let i: number = 0; i < operations.length; i++) {
       const trElement: HTMLTableRowElement = document.createElement("tr");
 
-      const operationIdCell = trElement.insertCell();
+      const operationIdCell: HTMLTableCellElement = trElement.insertCell();
       operationIdCell.classList.add("fw-bold");
       operationIdCell.innerText = operations[i].id?.toString() as string;
 
@@ -224,24 +231,24 @@ export class OperationsList {
       trElement.insertCell().innerText = operations[i].date;
       trElement.insertCell().innerText = operations[i].comment as string;
 
-      const gridToolsCell = trElement.insertCell();
-      const gridToolsWrapper = document.createElement("div");
+      const gridToolsCell: HTMLTableCellElement = trElement.insertCell();
+      const gridToolsWrapper: HTMLElement = document.createElement("div");
       gridToolsWrapper.classList.add("d-flex", "gap-2", "tools");
 
-      const deleteTool = document.createElement("a");
+      const deleteTool: HTMLAnchorElement = document.createElement("a");
       deleteTool.href = `/operations/delete?id=${operations[i].id}`;
       deleteTool.setAttribute("data-bs-toggle", "modal");
       deleteTool.setAttribute("data-bs-target", "#delete-action");
 
-      const deleteToolImage = document.createElement("img");
+      const deleteToolImage: HTMLImageElement = document.createElement("img");
       deleteToolImage.src = "/assets/images/icons/trash.svg";
 
       deleteTool.appendChild(deleteToolImage);
 
-      const editTool = document.createElement("a");
+      const editTool: HTMLAnchorElement = document.createElement("a");
       editTool.href = `/operations/edit?id=${operations[i].id}`;
 
-      const editToolImage = document.createElement("img");
+      const editToolImage: HTMLImageElement = document.createElement("img");
       editToolImage.src = "/assets/images/icons/pen.svg";
 
       editTool.appendChild(editToolImage);
@@ -263,6 +270,9 @@ export class OperationsList {
 
     if (result.error || (result.balance && isNaN(result.balance))) {
       alert("Возникла ошибка при запросе баланса.");
+      if (result.redirect) {
+        this.openNewRoute(result.redirect);
+      }
       return null;
     }
 

@@ -18,19 +18,20 @@ import { AuthUtils } from "./utilities/auth-utils";
 import { RouteType } from "./types/route.type";
 import { TokenKeyType } from "./types/token-key.type";
 import { AuthInfoType, UserInfo } from "./types/auth-info.type";
+import { JsonUtils } from "./utilities/json-utils";
+import { AuthService } from "./services/auth-service";
 
 export class Router {
   readonly titlePageElement: HTMLElement | null;
   readonly contentPageElement: HTMLElement | null;
   private profileNameElement: HTMLElement | null;
   private routes: RouteType[];
-  private userInfo: UserInfo | null;
+  private userInfo: UserInfo | undefined;
 
   constructor() {
     this.titlePageElement = document.getElementById("title");
     this.contentPageElement = document.getElementById("content");
     this.profileNameElement = null;
-    this.userInfo = null;
 
     this.initEvents();
 
@@ -226,12 +227,25 @@ export class Router {
           this.profileNameElement = document.getElementById("profile-name");
 
           if (!this.userInfo) {
-            let authInfo: AuthInfoType = AuthUtils.getAuthInfo(
+            const authInfo: AuthInfoType = AuthUtils.getAuthInfo(
               TokenKeyType.userInfoTokenKey
             );
 
             if (authInfo?.userInfo) {
-              this.userInfo = JSON.parse(authInfo.userInfo);
+              this.userInfo = JsonUtils.safeJsonParse(authInfo.userInfo);
+            }
+
+            if (!authInfo?.userInfo || !this.userInfo) {
+              await AuthService.logout({
+                refreshToken: AuthUtils.getAuthInfo(
+                  TokenKeyType.refreshTokenKey
+                )?.refreshToken,
+              });
+
+              AuthUtils.removeAuthInfo();
+
+              this.openNewRoute("/login");
+              return;
             }
           }
 
@@ -267,7 +281,7 @@ export class Router {
     document.querySelectorAll(".sidebar .nav-link").forEach((item: Element) => {
       const href: string | null = item.getAttribute("href");
       if (
-        (new RegExp(`(^${href}$)|(^${href}\/)`).test(route.route) &&
+        (new RegExp(`(^${href}$)|(^${href}/)`).test(route.route) &&
           href !== "/") ||
         (route.route === "/" && href === "/")
       ) {

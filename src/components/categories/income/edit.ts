@@ -3,7 +3,6 @@ import { IncomeCategoryService } from "../../../services/income-category-service
 import { CategoryType } from "../../../types/category.type";
 import {
   BalanceRequestResultType,
-  CategoriesRequestResultType,
   CategoryRequestResultType,
 } from "../../../types/request-result.type";
 import { ValidationType } from "../../../types/validation.type";
@@ -11,16 +10,16 @@ import { UrlUtils } from "../../../utilities/url-utils";
 import { ValidationUtils } from "../../../utilities/validation-utils";
 
 export class IncomeCategoryEdit {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
   private validations: ValidationType[] = [];
   private categoryNameElement: HTMLElement | null = null;
   private balanceElement: HTMLElement | null = null;
   private categoryOriginalData: CategoryType | null = null;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
-    const id = parseInt(UrlUtils.getUrlParam("id") ?? "");
+    const id:number = parseInt(UrlUtils.getUrlParam("id") ?? "");
     if (!id) {
       this.openNewRoute("/income");
       return;
@@ -56,7 +55,7 @@ export class IncomeCategoryEdit {
    * @param {number} id Ид категории.
    */
   async init(id: number) {
-    const category = await this.getCategory(id);
+    const category: CategoryType | null = await this.getCategory(id);
     if (category) {
       (this.categoryNameElement as HTMLInputElement).value = category.title as string;
     }
@@ -116,13 +115,13 @@ export class IncomeCategoryEdit {
         Object.keys(changedData).length > 0 &&
         this.categoryOriginalData?.id
       ) {
-        const response = await IncomeCategoryService.updateCategory(
+        const response: CategoryRequestResultType = await IncomeCategoryService.updateCategory(
           this.categoryOriginalData.id,
           changedData
         );
 
         if (response.error) {
-          alert(response.error);
+          alert(response.message);
           if (response.redirect) {
             this.openNewRoute(response.redirect);
             return;
@@ -156,6 +155,9 @@ export class IncomeCategoryEdit {
 
     if (result.error || (result.balance && isNaN(result.balance))) {
       alert("Возникла ошибка при запросе баланса.");
+      if (result.redirect) {
+        this.openNewRoute(result.redirect);
+      }
       return null;
     }
 

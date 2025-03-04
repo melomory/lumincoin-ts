@@ -1,4 +1,5 @@
 import CONFIG from "../config/config";
+import { AuthService } from "../services/auth-service";
 import { AuthInfoType } from "../types/auth-info.type";
 import { HttpMethod } from "../types/http-method.type";
 import { RequestParametersType } from "../types/request-parameters.type";
@@ -50,8 +51,19 @@ export class HttpUtils {
     try {
       response = await fetch(CONFIG.api + url, params);
       result.response = await response.json();
-    } catch (error) {
+    } catch {
       result.error = true;
+
+      // В бэкэнде не предусмотрен возврат кода 401, поэтому принудительно выходим из системы и отправляем на повторный вход.
+      result.redirect = "/login";
+
+      await AuthService.logout({
+        refreshToken: AuthUtils.getAuthInfo(TokenKeyType.refreshTokenKey)
+          ?.refreshToken,
+      });
+
+      AuthUtils.removeAuthInfo();
+
       return result;
     }
 
@@ -61,7 +73,8 @@ export class HttpUtils {
         if (!authInfo?.accessToken) {
           result.redirect = "/login";
         } else {
-          const updateTokenResult = await AuthUtils.updateRefreshToken();
+          const updateTokenResult: boolean =
+            await AuthUtils.updateRefreshToken();
           if (updateTokenResult) {
             return this.request(url, method, useAuth, body);
           } else {

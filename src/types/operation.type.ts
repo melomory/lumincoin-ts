@@ -1,5 +1,3 @@
-import { CategoryType } from "./category.type";
-
 export type OperationType = {
   id?: number;
   type: string;

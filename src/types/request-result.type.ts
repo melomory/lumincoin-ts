@@ -1,7 +1,7 @@
 import { UserInfo } from "./auth-info.type";
 import { CategoryType } from "./category.type";
 import { OperationType } from "./operation.type";
-import { TokenResponseType, TokenType } from "./token-response.type";
+import { TokenType } from "./token-response.type";
 
 export type DefaultRequestResultType = {
   error?: boolean;

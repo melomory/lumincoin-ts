@@ -1,4 +1,9 @@
-import Chart, { ChartItem, ChartTypeRegistry } from "chart.js/auto";
+import Chart, {
+  ChartConfiguration,
+  ChartData,
+  ChartItem,
+  ChartTypeRegistry,
+} from "chart.js/auto";
 import { AuthUtils } from "../utilities/auth-utils";
 import { BalanceService } from "../services/balance-service";
 import { OperationsService } from "../services/operations-service";
@@ -6,10 +11,11 @@ import { TokenKeyType } from "../types/token-key.type";
 import { FilterType } from "../types/filter-type";
 import { BalanceRequestResultType } from "../types/request-result.type";
 import { OperationType } from "../types/operation.type";
+import { JsonUtils } from "../utilities/json-utils";
 
 export class Main {
-  private openNewRoute: Function;
-  private currentFilter: FilterType | null = null;
+  private openNewRoute: (url: string) => Promise<void>;
+  private currentFilter: FilterType | undefined;
   private periodFilterElements: HTMLInputElement[] | null = [];
   private optionIntervalFromElement: HTMLInputElement | null = null;
   private optionIntervalToElement: HTMLInputElement | null = null;
@@ -24,7 +30,7 @@ export class Main {
     string
   > | null = null;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
     if (!AuthUtils.getAuthInfo(TokenKeyType.accessTokenKey)?.accessToken) {
@@ -34,7 +40,9 @@ export class Main {
 
     this.findElements();
 
-    this.currentFilter = JSON.parse(localStorage.getItem("main-filter") ?? "");
+    this.currentFilter = JsonUtils.safeJsonParse(
+      localStorage.getItem("main-filter") as string
+    );
 
     if (!this.currentFilter) {
       this.currentFilter = {
@@ -59,7 +67,7 @@ export class Main {
 
       if (this.optionIntervalFromElement) {
         if (this.currentFilter.dateFrom) {
-          let date = this.currentFilter.dateFrom.split("-");
+          const date: string[] = this.currentFilter.dateFrom.split("-");
           this.optionIntervalFromElement.value = `${date[2]}.${date[1]}.${date[0]}`;
         } else {
           this.optionIntervalFromElement.value =
@@ -69,7 +77,7 @@ export class Main {
 
       if (this.optionIntervalToElement) {
         if (this.currentFilter.dateTo) {
-          let date = this.currentFilter.dateTo.split("-");
+          const date: string[] = this.currentFilter.dateTo.split("-");
           this.optionIntervalToElement.value = `${date[2]}.${date[1]}.${date[0]}`;
         } else {
           this.optionIntervalToElement.value =
@@ -83,7 +91,7 @@ export class Main {
         (item: HTMLInputElement) => {
           item.addEventListener("focus", function () {
             if (this.value) {
-              let date = this.value.split(".");
+              const date: string[] = this.value.split(".");
               this.value = `${date[2]}-${date[1]}-${date[0]}`;
             }
 
@@ -92,7 +100,7 @@ export class Main {
           item.addEventListener("blur", function () {
             this.type = "text";
             if (this.value) {
-              let date = this.value.split("-");
+              const date: string[] = this.value.split("-");
               this.value = `${date[2]}.${date[1]}.${date[0]}`;
             }
           });
@@ -163,7 +171,8 @@ export class Main {
           this.optionIntervalFromElement.value &&
           this.optionIntervalFromElement.value !== this.currentFilter.dateFrom
         ) {
-          let date: string[] = this.optionIntervalFromElement.value.split(".");
+          const date: string[] =
+            this.optionIntervalFromElement.value.split(".");
           this.currentFilter.dateFrom = `${date[2]}-${date[1]}-${date[0]}`;
         } else {
           this.currentFilter.dateFrom = null;
@@ -174,7 +183,7 @@ export class Main {
           this.optionIntervalToElement.value &&
           this.optionIntervalToElement.value !== this.currentFilter.dateFrom
         ) {
-          let date: string[] = this.optionIntervalToElement.value.split(".");
+          const date: string[] = this.optionIntervalToElement.value.split(".");
           this.currentFilter.dateTo = `${date[2]}-${date[1]}-${date[0]}`;
         } else {
           this.currentFilter.dateTo = null;
@@ -196,6 +205,9 @@ export class Main {
 
     if (result.error || (result.balance && isNaN(result.balance))) {
       alert("Возникла ошибка при запросе баланса.");
+      if (result.redirect) {
+        this.openNewRoute(result.redirect);
+      }
       return null;
     }
 
@@ -228,7 +240,7 @@ export class Main {
     const expensesGrouped: Partial<Record<string, OperationType[]>> =
       Object.groupBy(expenses, ({ category }) => category as string);
 
-    const incomeData = {
+    const incomeData: ChartData<keyof ChartTypeRegistry, number[], string> = {
       labels: Object.keys(incomeGrouped),
       datasets: [
         {
@@ -245,12 +257,16 @@ export class Main {
       ],
     };
 
-    const incomeConfig: any = {
+    const incomeConfig: ChartConfiguration<
+      keyof ChartTypeRegistry,
+      number[],
+      string
+    > = {
       type: "pie",
       data: incomeData,
     };
 
-    const expensesData = {
+    const expensesData: ChartData<keyof ChartTypeRegistry, number[], string> = {
       labels: Object.keys(expensesGrouped),
       datasets: [
         {
@@ -267,7 +283,11 @@ export class Main {
       ],
     };
 
-    const expensesConfig: any = {
+    const expensesConfig: ChartConfiguration<
+      keyof ChartTypeRegistry,
+      number[],
+      string
+    > = {
       type: "pie",
       data: expensesData,
     };
@@ -298,14 +318,14 @@ export class Main {
    * @returns {string[]} Фоновые цвета.
    */
   private getBackgroundColors(length: number): string[] {
-    let colors: string[] = [
+    const colors: string[] = [
       "#dc3545",
       "#fd7e14",
       "#ffc107",
       "#20c997",
       "#0d6efd",
     ];
-    for (let i = colors.length - 1; i < length; ++i) {
+    for (let i: number = colors.length - 1; i < length; ++i) {
       const red: number = Math.round(Math.random() * 255);
       const green: number = Math.round(Math.random() * 255);
       const blue: number = Math.round(Math.random() * 255);

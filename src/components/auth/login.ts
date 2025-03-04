@@ -6,13 +6,13 @@ import { ValidationType } from "../../types/validation.type";
 import { AuthRequestResultType } from "../../types/request-result.type";
 
 export class Login {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
   private validations: ValidationType[] = [];
   private emailElement: HTMLElement | null = null;
   private passwordElement: HTMLElement | null = null;
   private rememberMeElement: HTMLElement | null = null;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
     if (AuthUtils.getAuthInfo(TokenKeyType.accessTokenKey)?.accessToken) {
