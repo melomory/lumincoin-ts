@@ -31,6 +31,7 @@ export class BalanceService {
       if (result.redirect) {
         returnObject.redirect = result.redirect;
       }
+
       return returnObject;
     }
 

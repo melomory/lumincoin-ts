@@ -1,4 +1,4 @@
-const host = process.env.HOST;
+const host: string | undefined = process.env.HOST;
 
 const CONFIG = {
   host: host,

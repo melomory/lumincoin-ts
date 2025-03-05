@@ -1,20 +1,20 @@
 import { BalanceService } from "../../../services/balance-service";
 import { IncomeCategoryService } from "../../../services/income-category-service";
+import { CategoryType } from "../../../types/category.type";
 import {
   BalanceRequestResultType,
-  CategoriesRequestResultType,
   CategoryRequestResultType,
 } from "../../../types/request-result.type";
 import { ValidationType } from "../../../types/validation.type";
 import { ValidationUtils } from "../../../utilities/validation-utils";
 
 export class IncomeCategoryCreate {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
   private validations: ValidationType[] = [];
   private categoryNameElement: HTMLElement | null = null;
   private balanceElement: HTMLElement | null = null;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
     this.findElements();
@@ -51,7 +51,7 @@ export class IncomeCategoryCreate {
     e.preventDefault();
 
     if (ValidationUtils.validateForm(this.validations)) {
-      const createData = {
+      const createData: CategoryType = {
         title: (this.categoryNameElement as HTMLInputElement).value,
       };
 
@@ -59,7 +59,7 @@ export class IncomeCategoryCreate {
         await IncomeCategoryService.createCategory(createData);
 
       if (response.error) {
-        alert(response.error);
+        alert(response.message);
         if (response.redirect) {
           this.openNewRoute(response.redirect);
           return;
@@ -89,6 +89,9 @@ export class IncomeCategoryCreate {
 
     if (result.error || (result.balance && isNaN(result.balance))) {
       alert("Возникла ошибка при запросе баланса.");
+      if (result.redirect) {
+        this.openNewRoute(result.redirect);
+      }
       return null;
     }
 

@@ -1,13 +1,14 @@
 import { OperationsService } from "../../services/operations-service";
+import { DefaultRequestResultType } from "../../types/request-result.type";
 import { UrlUtils } from "../../utilities/url-utils";
 
 export class OperationsDelete {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
-    const id = parseInt(UrlUtils.getUrlParam("id") ?? "");
+    const id: number = parseInt(UrlUtils.getUrlParam("id") ?? "");
     if (!id) {
       this.openNewRoute("/operations");
       return;
@@ -26,10 +27,10 @@ export class OperationsDelete {
    * @param {number} id Ид операции.
    */
   private async deleteOperation(id: number): Promise<void> {
-    const response = await OperationsService.deleteOperation(id);
+    const response: DefaultRequestResultType = await OperationsService.deleteOperation(id);
 
     if (response.error) {
-      alert(response.error);
+      alert(response.message);
       if (response.redirect) {
         this.openNewRoute(response.redirect);
         return;

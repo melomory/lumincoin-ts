@@ -4,7 +4,7 @@ export class ValidationUtils {
   public static validateForm(validations: ValidationType[]): boolean {
     let isValid: boolean = true;
 
-    for (let i = 0; i < validations.length; i++) {
+    for (let i: number = 0; i < validations.length; i++) {
       if (
         !ValidationUtils.validateField(
           validations[i].element,
@@ -23,7 +23,7 @@ export class ValidationUtils {
       return false;
     }
 
-    let condition = Boolean(element.value);
+    let condition: boolean = Boolean(element.value);
     if (options) {
       if (options.pattern) {
         condition = Boolean(element.value) && options.pattern.test(element.value);

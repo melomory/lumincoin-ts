@@ -56,7 +56,9 @@ export class IncomeCategoryService {
       category: null,
     };
 
-    const result = await HttpUtils.request(`/categories/income/${id}`);
+    const result: RequestResultType = await HttpUtils.request(
+      `/categories/income/${id}`
+    );
 
     if (result.redirect || result.error || !result.response) {
       returnObject.error = true;

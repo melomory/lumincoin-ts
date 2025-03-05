@@ -1,13 +1,13 @@
 import { BalanceService } from "../../../services/balance-service";
 import { IncomeCategoryService } from "../../../services/income-category-service";
 import { CategoryType } from "../../../types/category.type";
-import { BalanceRequestResultType } from "../../../types/request-result.type";
+import { BalanceRequestResultType, CategoriesRequestResultType } from "../../../types/request-result.type";
 
 export class IncomeCategoryList {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
   private balanceElement: HTMLElement | null = null;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
     this.balanceElement = document.getElementById("balance");
@@ -21,10 +21,10 @@ export class IncomeCategoryList {
    * @returns {string} Маршрут перенаправления.
    */
   private async getCategories(): Promise<void> {
-    const response = await IncomeCategoryService.getCategories();
+    const response: CategoriesRequestResultType = await IncomeCategoryService.getCategories();
 
     if (response.error) {
-      alert(response.error);
+      alert(response.message);
       if (response.redirect) {
         this.openNewRoute(response.redirect);
         return;
@@ -39,13 +39,13 @@ export class IncomeCategoryList {
    * @param {CategoryType[]} categories Категории.
    */
   private show(categories: CategoryType[] | null): void {
-    const categoriesElement = document.getElementById("categories");
+    const categoriesElement: HTMLElement | null = document.getElementById("categories");
 
     if (!categoriesElement || !categories) {
       return;
     }
 
-    for (let i = 0; i < categories.length; i++) {
+    for (let i: number = 0; i < categories.length; i++) {
       const cardElement: HTMLElement = document.createElement("div");
       cardElement.classList.add("card", "p-1");
 
@@ -107,6 +107,9 @@ export class IncomeCategoryList {
 
     if (result.error || (result.balance && isNaN(result.balance))) {
       alert("Возникла ошибка при запросе баланса.");
+      if (result.redirect) {
+        this.openNewRoute(result.redirect);
+      }
       return null;
     }
 

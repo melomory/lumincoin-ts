@@ -3,16 +3,17 @@ import { AuthService } from "../../services/auth-service";
 import { TokenKeyType } from "../../types/token-key.type";
 
 export class Logout {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
     if (
-      !AuthUtils.getAuthInfo(TokenKeyType.accessTokenKey) ||
-      !AuthUtils.getAuthInfo(TokenKeyType.refreshTokenKey)
+      !AuthUtils.getAuthInfo(TokenKeyType.accessTokenKey)?.accessToken ||
+      !AuthUtils.getAuthInfo(TokenKeyType.refreshTokenKey)?.refreshToken
     ) {
-      return this.openNewRoute("/login");
+      this.openNewRoute("/login");
+      return;
     }
 
     this.logout().then();

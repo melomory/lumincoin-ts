@@ -10,15 +10,15 @@ import { UrlUtils } from "../../../utilities/url-utils";
 import { ValidationUtils } from "../../../utilities/validation-utils";
 
 export class ExpensesCategoryEdit {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
   private validations: ValidationType[] = [];
   private categoryNameElement: HTMLElement | null = null;
   private balanceElement: HTMLElement | null = null;
   private categoryOriginalData: CategoryType | null = null;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
-    const id = parseInt(UrlUtils.getUrlParam("id") ?? "");
+    const id: number = parseInt(UrlUtils.getUrlParam("id") ?? "");
     if (!id) {
       this.openNewRoute("/expenses");
       return;
@@ -54,9 +54,10 @@ export class ExpensesCategoryEdit {
    * @param {number} id Ид категории.
    */
   private async init(id: number): Promise<void> {
-    const category = await this.getCategory(id);
+    const category: CategoryType | null = await this.getCategory(id);
     if (category && this.categoryNameElement) {
-      (this.categoryNameElement as HTMLInputElement).value = category.title ?? "";
+      (this.categoryNameElement as HTMLInputElement).value =
+        category.title ?? "";
     }
 
     await this.getBalance();
@@ -121,7 +122,7 @@ export class ExpensesCategoryEdit {
           );
 
         if (response.error) {
-          alert(response.error);
+          alert(response.message);
           if (response.redirect) {
             this.openNewRoute(response.redirect);
             return;
@@ -155,6 +156,9 @@ export class ExpensesCategoryEdit {
 
     if (result.error || (result.balance && isNaN(result.balance))) {
       alert("Возникла ошибка при запросе баланса.");
+      if (result.redirect) {
+        this.openNewRoute(result.redirect);
+      }
       return null;
     }
 

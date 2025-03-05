@@ -14,7 +14,7 @@ import { UrlUtils } from "../../utilities/url-utils";
 import { ValidationUtils } from "../../utilities/validation-utils";
 
 export class OperationsEdit {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
   private validations: ValidationType[] = [];
   private balanceElement: HTMLElement | null = null;
   private typeElement: HTMLElement | null = null;
@@ -24,12 +24,13 @@ export class OperationsEdit {
   private commentElement: HTMLElement | null = null;
   private operationOriginalData: OperationType | null = null;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
-    const id = parseInt(UrlUtils.getUrlParam("id") ?? "");
+    const id: number = parseInt(UrlUtils.getUrlParam("id") ?? "");
     if (!id) {
-      return this.openNewRoute("/operations");
+      this.openNewRoute("/operations");
+      return;
     }
 
     this.findElements();
@@ -44,7 +45,7 @@ export class OperationsEdit {
 
     if (this.typeElement) {
       this.typeElement.addEventListener("change", async () => {
-        const categories = await this.getCategories(
+        const categories: CategoryType[] | null = await this.getCategories(
           (this.typeElement as HTMLInputElement)?.value
         );
 
@@ -74,7 +75,7 @@ export class OperationsEdit {
     if (this.dateElement) {
       this.dateElement.addEventListener("focus", function () {
         if ((this as HTMLInputElement).value) {
-          let date = (this as HTMLInputElement).value.split(".");
+          const date: string[] = (this as HTMLInputElement).value.split(".");
           (this as HTMLInputElement).value = `${date[2]}-${date[1]}-${date[0]}`;
         }
 
@@ -84,7 +85,7 @@ export class OperationsEdit {
       this.dateElement.addEventListener("blur", function () {
         (this as HTMLInputElement).type = "text";
         if ((this as HTMLInputElement).value) {
-          let date = (this as HTMLInputElement).value.split("-");
+          const date: string[] = (this as HTMLInputElement).value.split("-");
           (this as HTMLInputElement).value = `${date[2]}.${date[1]}.${date[0]}`;
         }
       });
@@ -114,17 +115,23 @@ export class OperationsEdit {
 
     if (operation) {
       (this.typeElement as HTMLInputElement).value = operation.type; //= operation.type === "income" ? "Доход" : "Расход";
-      (this.amountElement as HTMLInputElement).value = operation.amount.toString();
-      (this.commentElement as HTMLInputElement).value = operation.comment as string;
+      (this.amountElement as HTMLInputElement).value =
+        operation.amount.toString();
+      (this.commentElement as HTMLInputElement).value =
+        operation.comment as string;
 
-      const categories = await this.getCategories(operation.type);
+      const categories: CategoryType[] | null = await this.getCategories(
+        operation.type
+      );
 
       if (categories) {
         this.populateCategoryControl(categories, operation.category);
       }
 
-      let date: string[] = operation.date.split("-");
-      (this.dateElement as HTMLInputElement).value = `${date[2]}.${date[1]}.${date[0]}`;
+      const date: string[] = operation.date.split("-");
+      (
+        this.dateElement as HTMLInputElement
+      ).value = `${date[2]}.${date[1]}.${date[0]}`;
     }
 
     await this.getBalance();
@@ -142,7 +149,7 @@ export class OperationsEdit {
         : await ExpensesCategoryService.getCategories();
 
     if (response.error) {
-      alert(response.error);
+      alert(response.message);
       if (response.redirect) {
         this.openNewRoute(response.redirect);
         return null;
@@ -168,7 +175,11 @@ export class OperationsEdit {
     const optionsToRemove: HTMLCollectionOf<HTMLOptionElement> =
       this.categoryElement.getElementsByTagName("option");
 
-    for (let i = optionsToRemove.length - 1; optionsToRemove.length > 1; --i) {
+    for (
+      let i: number = optionsToRemove.length - 1;
+      optionsToRemove.length > 1;
+      --i
+    ) {
       this.categoryElement.removeChild(optionsToRemove[i]);
     }
 
@@ -176,7 +187,7 @@ export class OperationsEdit {
       return;
     }
 
-    for (let i = 0; i < categories.length; ++i) {
+    for (let i: number = 0; i < categories.length; ++i) {
       const optionElement: HTMLOptionElement = document.createElement("option");
       optionElement.value = categories[i].id?.toString() as string;
       optionElement.innerText = categories[i].title as string;
@@ -220,8 +231,10 @@ export class OperationsEdit {
     e.preventDefault();
 
     if (ValidationUtils.validateForm(this.validations)) {
-      const date = (this.dateElement as HTMLInputElement)?.value.split(".");
-      const dateISO = date ? `${date[2]}-${date[1]}-${date[0]}` : "";
+      const date: string[] = (
+        this.dateElement as HTMLInputElement
+      )?.value.split(".");
+      const dateISO: string = date ? `${date[2]}-${date[1]}-${date[0]}` : "";
       const changedData: OperationType = {
         type: (this.typeElement as HTMLInputElement)?.value,
         amount: parseInt((this.amountElement as HTMLInputElement)?.value) ?? 0,
@@ -242,7 +255,7 @@ export class OperationsEdit {
           );
 
         if (response.error) {
-          alert(response.error);
+          alert(response.message);
           if (response.redirect) {
             this.openNewRoute(response.redirect);
             return;
@@ -276,6 +289,9 @@ export class OperationsEdit {
 
     if (result.error || (result.balance && isNaN(result.balance))) {
       alert("Возникла ошибка при запросе баланса.");
+      if (result.redirect) {
+        this.openNewRoute(result.redirect);
+      }
       return null;
     }
 

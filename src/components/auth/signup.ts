@@ -3,16 +3,17 @@ import { ValidationUtils } from "../../utilities/validation-utils";
 import { AuthService } from "../../services/auth-service";
 import { TokenKeyType } from "../../types/token-key.type";
 import { ValidationType } from "../../types/validation.type";
+import { AuthRequestResultType } from "../../types/request-result.type";
 
 export class Signup {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
   private validations: ValidationType[] = [];
   private emailElement: HTMLElement | null = null;
   private passwordElement: HTMLElement | null = null;
   private passwordRepeatElement: HTMLElement | null = null;
   private fullNameElement: HTMLElement | null = null;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
     if (AuthUtils.getAuthInfo(TokenKeyType.accessTokenKey)?.accessToken) {
@@ -56,7 +57,7 @@ export class Signup {
    * Зарегистрировать.
    */
   private async signUp(): Promise<void> {
-    for (let i = 0; i < this.validations.length; i++) {
+    for (let i: number = 0; i < this.validations.length; i++) {
       if (
         this.passwordRepeatElement &&
         this.validations[i].element === this.passwordRepeatElement &&
@@ -72,7 +73,7 @@ export class Signup {
       const [lastName, name] = (this.fullNameElement as HTMLInputElement).value
         .split(" ")
         .map((x) => x.trim());
-      const signupResult = await AuthService.signup({
+      const signupResult: AuthRequestResultType = await AuthService.signup({
         name: name,
         lastName: lastName,
         email: (this.emailElement as HTMLInputElement).value,

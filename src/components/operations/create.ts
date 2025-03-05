@@ -3,6 +3,7 @@ import { ExpensesCategoryService } from "../../services/expenses-category-servic
 import { IncomeCategoryService } from "../../services/income-category-service";
 import { OperationsService } from "../../services/operations-service";
 import { CategoryType } from "../../types/category.type";
+import { OperationType } from "../../types/operation.type";
 import {
   BalanceRequestResultType,
   CategoriesRequestResultType,
@@ -13,7 +14,7 @@ import { UrlUtils } from "../../utilities/url-utils";
 import { ValidationUtils } from "../../utilities/validation-utils";
 
 export class OperationsCreate {
-  private openNewRoute: Function;
+  private openNewRoute: (url: string) => Promise<void>;
   private validations: ValidationType[] = [];
   private typeElement: HTMLElement | null = null;
   private categoryElement: HTMLElement | null = null;
@@ -22,7 +23,7 @@ export class OperationsCreate {
   private commentElement: HTMLElement | null = null;
   private balanceElement: HTMLElement | null = null;
 
-  constructor(openNewRoute: Function) {
+  constructor(openNewRoute: (url: string) => Promise<void>) {
     this.openNewRoute = openNewRoute;
 
     this.findElements();
@@ -37,7 +38,7 @@ export class OperationsCreate {
 
     if (this.typeElement) {
       this.typeElement.addEventListener("change", async () => {
-        const categories = await this.getCategories(
+        const categories: CategoryType[] | null = await this.getCategories(
           (this.typeElement as HTMLInputElement).value
         );
 
@@ -67,7 +68,7 @@ export class OperationsCreate {
     if (this.dateElement) {
       this.dateElement.addEventListener("focus", function () {
         if ((this as HTMLInputElement).value) {
-          let date = (this as HTMLInputElement).value.split(".");
+          const date: string[] = (this as HTMLInputElement).value.split(".");
           (this as HTMLInputElement).value = `${date[2]}-${date[1]}-${date[0]}`;
         }
 
@@ -77,7 +78,7 @@ export class OperationsCreate {
       this.dateElement.addEventListener("blur", function () {
         (this as HTMLInputElement).type = "text";
         if ((this as HTMLInputElement).value) {
-          let date = (this as HTMLInputElement).value.split("-");
+          const date: string[] = (this as HTMLInputElement).value.split("-");
           (this as HTMLInputElement).value = `${date[2]}.${date[1]}.${date[0]}`;
         }
       });
@@ -102,7 +103,7 @@ export class OperationsCreate {
    * Инициализировать значения на странице.
    */
   private async init(): Promise<void> {
-    const type = UrlUtils.getUrlParam("type");
+    const type: string | null = UrlUtils.getUrlParam("type");
     if (type && this.typeElement) {
       (this.typeElement as HTMLInputElement).value = type;
 
@@ -128,7 +129,7 @@ export class OperationsCreate {
         : await ExpensesCategoryService.getCategories();
 
     if (response.error) {
-      alert(response.error);
+      alert(response.message);
       if (response.redirect) {
         this.openNewRoute(response.redirect);
         return null;
@@ -147,9 +148,14 @@ export class OperationsCreate {
       return;
     }
 
-    const optionsToRemove = this.categoryElement.getElementsByTagName("option");
+    const optionsToRemove: HTMLCollectionOf<HTMLOptionElement> =
+      this.categoryElement.getElementsByTagName("option");
 
-    for (let i = optionsToRemove.length - 1; optionsToRemove.length > 1; --i) {
+    for (
+      let i: number = optionsToRemove.length - 1;
+      optionsToRemove.length > 1;
+      --i
+    ) {
       this.categoryElement.removeChild(optionsToRemove[i]);
     }
 
@@ -157,7 +163,7 @@ export class OperationsCreate {
       return;
     }
 
-    for (let i = 0; i < categories.length; ++i) {
+    for (let i: number = 0; i < categories.length; ++i) {
       const optionElement: HTMLOptionElement = document.createElement("option");
       optionElement.value = categories[i].id?.toString() as string;
       optionElement.innerText = categories[i].title as string;
@@ -180,10 +186,10 @@ export class OperationsCreate {
       )?.value.split(".");
       const dateISO: string = `${date[2]}-${date[1]}-${date[0]}`;
 
-      const createData = {
+      const createData: OperationType = {
         type: (this.typeElement as HTMLInputElement).value,
         category_id: parseInt((this.categoryElement as HTMLInputElement).value),
-        amount: (this.amountElement as HTMLInputElement).value,
+        amount: parseInt((this.amountElement as HTMLInputElement).value),
         date: dateISO,
         comment: (this.commentElement as HTMLInputElement).value,
       };
@@ -192,7 +198,7 @@ export class OperationsCreate {
         await OperationsService.createOperation(createData);
 
       if (response.error) {
-        alert(response.error);
+        alert(response.message);
         if (response.redirect) {
           this.openNewRoute(response.redirect);
           return;
@@ -222,6 +228,9 @@ export class OperationsCreate {
 
     if (result.error || (result.balance && isNaN(result.balance))) {
       alert("Возникла ошибка при запросе баланса.");
+      if (result.redirect) {
+        this.openNewRoute(result.redirect);
+      }
       return null;
     }
 
